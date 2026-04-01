@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API-209 · Course Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#ffffff;--bg2:#f7f6f3;--bg3:#efede9;
+    --text:#1a1a1a;--text2:#6b6b6b;--text3:#9b9b9b;
+    --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+    --green:#1d9e75;--green-bg:#e8f5f0;
+    --amber-bg:#fef3e2;--amber:#b45309;
+    --blue-bg:#eff6ff;--blue:#1d4ed8;
+    --sidebar-w:236px;--radius:6px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;font-size:14px}
+  .layout{display:flex;height:100vh}
+  .sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;user-select:none}
+  .sidebar-top{padding:16px 14px 12px;border-bottom:1px solid var(--border)}
+  .workspace{display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:var(--radius)}
+  .ws-icon{width:24px;height:24px;background:#2f6df0;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0}
+  .ws-name{font-size:13px;font-weight:600;color:var(--text)}
+  .ws-sub{font-size:11px;color:var(--text3);margin-top:1px}
+  .sidebar-nav{flex:1;overflow-y:auto;padding:8px 6px}
+  .nav-section{font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);padding:14px 8px 5px}
+  .nav-item{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:var(--radius);cursor:pointer;font-size:13px;color:var(--text2);transition:background .1s,color .1s;margin-bottom:1px}
+  .nav-item:hover{background:var(--bg3);color:var(--text)}
+  .nav-item.active{background:var(--bg3);color:var(--text);font-weight:500}
+  .nav-icon{font-size:13px;width:20px;text-align:center;flex-shrink:0}
+  .nav-label{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nav-badge{font-size:10px;padding:1px 6px;border-radius:10px;background:var(--bg3);color:var(--text3);font-variant-numeric:tabular-nums;flex-shrink:0}
+  .nav-badge.warn{background:var(--amber-bg);color:var(--amber)}
+  .nav-badge.ok{background:var(--green-bg);color:var(--green)}
+  .sidebar-footer{padding:10px 14px;border-top:1px solid var(--border);font-size:11px;color:var(--text3);line-height:1.5}
+  .main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 28px;border-bottom:1px solid var(--border);background:var(--bg);min-height:48px}
+  .breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text2)}
+  .breadcrumb-cur{color:var(--text);font-weight:500}
+  .topbar-actions{display:flex;align-items:center;gap:8px}
+  .view-toggle{display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:2px;gap:2px}
+  .vbtn{padding:3px 10px;border-radius:4px;font-size:12px;cursor:pointer;color:var(--text3);transition:all .12s}
+  .vbtn.active{background:var(--bg);color:var(--text);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .action-btn{padding:4px 12px;border-radius:var(--radius);font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--bg);color:var(--text2);text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:background .12s}
+  .action-btn:hover{background:var(--bg2)}
+  .content{flex:1;overflow-y:auto;padding:28px 32px}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+  .stat-card{background:var(--bg2);border-radius:8px;padding:14px 16px}
+  .stat-label{font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+  .stat-val{font-size:26px;font-weight:600;color:var(--text);line-height:1}
+  .stat-val.green{color:var(--green)}
+  .prog-section{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:18px 20px;margin-bottom:20px}
+  .prog-section-title{font-size:13px;font-weight:600;margin-bottom:16px;color:var(--text)}
+  .prog-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;cursor:pointer;border-radius:var(--radius);padding:4px 6px;transition:background .1s}
+  .prog-row:hover{background:var(--bg2)}
+  .prog-row:last-child{margin-bottom:0}
+  .prog-name{font-size:13px;color:var(--text2);width:200px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .prog-track{flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden}
+  .prog-fill{height:100%;border-radius:3px;background:var(--green);transition:width .5s cubic-bezier(.4,0,.2,1)}
+  .prog-pct{font-size:11px;color:var(--text3);width:34px;text-align:right;font-variant-numeric:tabular-nums;font-family:'DM Mono',monospace}
+  .prog-count{font-size:11px;color:var(--text3);width:60px;text-align:right;font-variant-numeric:tabular-nums;font-family:'DM Mono',monospace}
+  .section-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+  .sec-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;cursor:pointer;transition:border-color .15s,transform .1s}
+  .sec-card:hover{border-color:var(--border2);transform:translateY(-1px)}
+  .sec-card-name{font-size:12px;font-weight:500;margin-bottom:10px;color:var(--text);line-height:1.4}
+  .sec-card-pct{font-size:22px;font-weight:600;margin-bottom:6px}
+  .sec-card-track{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-bottom:10px}
+  .sec-card-fill{height:100%;border-radius:2px;background:var(--green)}
+  .pill{display:inline-block;font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px}
+  .pill-ns{background:var(--bg3);color:var(--text3)}
+  .pill-ip{background:var(--blue-bg);color:var(--blue)}
+  .pill-done{background:var(--green-bg);color:var(--green)}
+  .filter-bar{display:flex;gap:6px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+  .filter-label{font-size:12px;color:var(--text3);margin-right:2px}
+  .fbtn{padding:4px 12px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid var(--border);background:var(--bg);color:var(--text2);transition:all .12s}
+  .fbtn.active{background:var(--text);color:#fff;border-color:var(--text)}
+  .task-table{width:100%;border-collapse:collapse}
+  .task-table thead th{text-align:left;padding:7px 12px;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);background:var(--bg2);white-space:nowrap}
+  .task-table tbody tr{transition:background .1s}
+  .task-table tbody tr:hover td{background:var(--bg2)}
+  .task-table tbody td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:13px}
+  .task-table tbody tr:last-child td{border-bottom:none}
+  .checkbox{width:15px;height:15px;border-radius:3px;border:1.5px solid #ccc;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px}
+  .checkbox.done{background:var(--green);border-color:var(--green);color:#fff}
+  .task-text.done{color:var(--text3);text-decoration:line-through}
+  .person-tag{display:inline-block;font-size:11px;background:var(--bg2);color:var(--text2);padding:2px 8px;border-radius:4px}
+  .date-tag{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace}
+  .notes-text{font-size:11px;color:var(--text3)}
+  .group-row td{padding:14px 12px 5px;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);border-bottom:1px solid var(--border)}
+  .board{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .board-col{display:flex;flex-direction:column}
+  .board-col-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .board-col-title{font-size:12px;font-weight:600;color:var(--text2)}
+  .board-count{font-size:11px;color:var(--text3);background:var(--bg2);padding:1px 7px;border-radius:10px}
+  .board-cards{display:flex;flex-direction:column;gap:7px;overflow-y:auto;max-height:calc(100vh - 200px);padding-bottom:20px}
+  .task-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;transition:border-color .15s,box-shadow .15s}
+  .task-card:hover{border-color:var(--border2);box-shadow:0 2px 8px rgba(0,0,0,.05)}
+  .card-title{font-size:13px;font-weight:500;line-height:1.4;margin-bottom:8px;color:var(--text)}
+  .card-title.done{color:var(--text3);text-decoration:line-through;font-weight:400}
+  .card-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .card-notes{font-size:11px;color:var(--text3);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);line-height:1.5}
+  .loading{display:flex;align-items:center;justify-content:center;height:200px;color:var(--text3);font-size:13px;gap:8px}
+  .spinner{width:16px;height:16px;border:2px solid var(--bg3);border-top-color:#2f6df0;border-radius:50%;animation:spin .7s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .empty{text-align:center;padding:60px 20px;color:var(--text3);font-size:13px}
+  .error-box{background:#fff5f5;border:1px solid #fecaca;border-radius:8px;padding:20px 24px;color:#991b1b;font-size:13px;line-height:1.8}
+  .error-box strong{display:block;margin-bottom:6px;font-size:14px}
+  .page-hero{margin-bottom:24px}
+  .page-hero h1{font-size:28px;font-weight:700;letter-spacing:-.5px;margin-bottom:4px}
+  .page-hero p{font-size:13px;color:var(--text3)}
+  ::-webkit-scrollbar{width:5px;height:5px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:4px}
+</style>
+</head>
+<body>
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-top">
+      <div class="workspace">
+        <div class="ws-icon">A</div>
+        <div>
+          <div class="ws-name">API-209</div>
+          <div class="ws-sub">Fall 2026</div>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section">Overview</div>
+      <div class="nav-item active" onclick="navigate('dashboard')" id="nav-dashboard">
+        <span class="nav-icon">⊞</span><span class="nav-label">Dashboard</span>
+      </div>
+      <div class="nav-section">Checklists</div>
+      <div class="nav-item" onclick="navigate('before')" id="nav-before">
+        <span class="nav-icon">✦</span><span class="nav-label">Before Semester</span>
+        <span class="nav-badge warn" id="badge-before">—</span>
+      </div>
+      <div class="nav-item" onclick="navigate('slides')" id="nav-slides">
+        <span class="nav-icon">▤</span><span class="nav-label">Slides</span>
+        <span class="nav-badge warn" id="badge-slides">—</span>
+      </div>
+      <div class="nav-item" onclick="navigate('pces')" id="nav-pces">
+        <span class="nav-icon">◈</span><span class="nav-label">PCEs</span>
+        <span class="nav-badge warn" id="badge-pces">—</span>
+      </div>
+      <div class="nav-item" onclick="navigate('psets-pre')" id="nav-psets-pre">
+        <span class="nav-icon">○</span><span class="nav-label">Prob Sets (Pre)</span>
+        <span class="nav-badge warn" id="badge-psets-pre">—</span>
+      </div>
+      <div class="nav-item" onclick="navigate('psets-post')" id="nav-psets-post">
+        <span class="nav-icon">○</span><span class="nav-label">Prob Sets (Post)</span>
+        <span class="nav-badge warn" id="badge-psets-post">—</span>
+      </div>
+      <div class="nav-item" onclick="navigate('exam-prep')" id="nav-exam-prep">
+        <span class="nav-icon">◇</span><span class="nav-label">Exam Prep</span>
+        <span class="nav-badge warn" id="badge-exam-prep">—</span>
+      </div>
+      <div class="nav-item" onclick="navigate('exam-grade')" id="nav-exam-grade">
+        <span class="nav-icon">◇</span><span class="nav-label">Exam Grading</span>
+        <span class="nav-badge warn" id="badge-exam-grade">—</span>
+      </div>
+      <div class="nav-item" onclick="navigate('final')" id="nav-final">
+        <span class="nav-icon">◆</span><span class="nav-label">Final Exercise</span>
+        <span class="nav-badge warn" id="badge-final">—</span>
+      </div>
+      <div class="nav-item" onclick="navigate('end')" id="nav-end">
+        <span class="nav-icon">◉</span><span class="nav-label">End of Semester</span>
+        <span class="nav-badge warn" id="badge-end">—</span>
+      </div>
+    </div>
+    <div class="sidebar-footer">Teaching Team Dashboard<br>Live progress tracker</div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="breadcrumb">
+        <span>API-209</span>
+        <span style="color:var(--border2)">›</span>
+        <span class="breadcrumb-cur" id="page-title">Dashboard</span>
+      </div>
+      <div class="topbar-actions">
+        <div class="view-toggle" id="view-toggle" style="display:none">
+          <div class="vbtn active" onclick="setView('list')" id="vbtn-list">List</div>
+          <div class="vbtn" onclick="setView('board')" id="vbtn-board">Board</div>
+        </div>
+        <a class="action-btn" href="https://docs.google.com/spreadsheets/d/1JrYZlzUiWm-8kqj8lIO-czIczU6r5yDxTlGENx_rzx8/edit" target="_blank">Open Sheet ↗</a>
+      </div>
+    </div>
+    <div class="content" id="content">
+      <div class="loading"><div class="spinner"></div> Loading…</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SHEET_ID = '1JrYZlzUiWm-8kqj8lIO-czIczU6r5yDxTlGENx_rzx8';
+
+// Exact sheet tab names from the spreadsheet
+const SHEET_NAMES = {
+  before:       'Before Semester',
+  slides:       'Slides',
+  pces:         'PCEs',
+  'psets-pre':  'Prob Sets - Pretesting',
+  'psets-post': 'Prob Sets - PostingGrading',
+  'exam-prep':  'Exam Prep',
+  'exam-grade': 'Exam Grading',
+  final:        'Final Exercise',
+  end:          'End of Semester',
+};
+
+const SECTIONS = [
+  { key:'before',      label:'Before Semester' },
+  { key:'slides',      label:'Slides' },
+  { key:'pces',        label:'PCEs' },
+  { key:'psets-pre',   label:'Prob Sets (Pre)' },
+  { key:'psets-post',  label:'Prob Sets (Post)' },
+  { key:'exam-prep',   label:'Exam Prep' },
+  { key:'exam-grade',  label:'Exam Grading' },
+  { key:'final',       label:'Final Exercise' },
+  { key:'end',         label:'End of Semester' },
+];
+
+const PAGE_NAMES = {
+  dashboard:'Dashboard',
+  before:'Before Semester', slides:'Slides', pces:'PCEs',
+  'psets-pre':'Prob Sets – Pretesting','psets-post':'Prob Sets – PostGrading',
+  'exam-prep':'Exam Prep','exam-grade':'Exam Grading',
+  final:'Final Exercise', end:'End of Semester'
+};
+
+let currentPage = 'dashboard';
+let currentView = 'list';
+let currentFilter = 'all';
+let cache = {};
+let lastData = [];
+let sectionStats = {};
+
+function sheetUrl(name) {
+  return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(name)}`;
+}
+
+function parseCSV(txt) {
+  const rows = [];
+  for (const line of txt.split('\n')) {
+    if (!line.trim()) continue;
+    const cells = []; let inQ = false, cell = '';
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') inQ = !inQ;
+      else if (c === ',' && !inQ) { cells.push(cell.trim()); cell = ''; }
+      else cell += c;
+    }
+    cells.push(cell.trim());
+    rows.push(cells);
+  }
+  return rows;
+}
+
+function clean(s) { return (s||'').replace(/^"+|"+$/g,'').trim(); }
+
+async function fetchSheet(name) {
+  if (cache[name]) return cache[name];
+  const resp = await fetch(sheetUrl(name));
+  if (!resp.ok) throw new Error(`HTTP ${resp.status} for sheet "${name}"`);
+  const text = await resp.text();
+  if (text.trim().startsWith('<')) throw new Error('CORS error: open via local server using the included launcher script');
+  cache[name] = parseCSV(text);
+  return cache[name];
+}
+
+async function loadBefore() {
+  const rows = await fetchSheet(SHEET_NAMES.before);
+  const tasks = []; let group = '';
+  for (const r of rows) {
+    const item = clean(r[4]);
+    if (!item) continue;
+    const doneRaw = clean(r[2]).toUpperCase();
+    const deadline = clean(r[1]);
+    // If no checkbox-like value and no deadline, it's a section header
+    if (doneRaw !== 'TRUE' && doneRaw !== 'FALSE' && !deadline) { group = item; continue; }
+    tasks.push({ item, done: doneRaw === 'TRUE', deadline, responsible: clean(r[3]), notes: clean(r[5]), group });
+  }
+  return tasks;
+}
+
+async function loadChecklist(key) {
+  const rows = await fetchSheet(SHEET_NAMES[key]);
+  const tasks = []; let group = '';
+  for (const r of rows) {
+    const item = clean(r[0]);
+    if (!item) continue;
+    const col1 = clean(r[1]).toUpperCase();
+    if (col1 !== 'TRUE' && col1 !== 'FALSE') { group = item; continue; }
+    tasks.push({ item, done: col1 === 'TRUE', group, deadline: clean(r[2]), responsible: '', notes: clean(r[3]) });
+  }
+  return tasks;
+}
+
+async function getData(page) {
+  if (page === 'before') return loadBefore();
+  return loadChecklist(page);
+}
+
+function navigate(page) {
+  currentPage = page; currentFilter = 'all';
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const el = document.getElementById('nav-' + page);
+  if (el) el.classList.add('active');
+  document.getElementById('page-title').textContent = PAGE_NAMES[page] || page;
+  document.getElementById('view-toggle').style.display = page !== 'dashboard' ? 'flex' : 'none';
+  render();
+}
+
+function setView(v) {
+  currentView = v;
+  document.getElementById('vbtn-list').classList.toggle('active', v === 'list');
+  document.getElementById('vbtn-board').classList.toggle('active', v === 'board');
+  renderContent(lastData);
+}
+
+function setFilter(f) { currentFilter = f; renderContent(lastData); }
+
+function updateBadge(key, done, total) {
+  const b = document.getElementById('badge-' + key);
+  if (!b) return;
+  b.textContent = done + '/' + total;
+  b.className = 'nav-badge ' + (done === total && total > 0 ? 'ok' : 'warn');
+}
+
+async function render() {
+  const c = document.getElementById('content');
+  if (currentPage === 'dashboard') { renderDashboard(); return; }
+  c.innerHTML = '<div class="loading"><div class="spinner"></div> Loading from Google Sheets…</div>';
+  try {
+    const data = await getData(currentPage);
+    lastData = data;
+    const done = data.filter(t => t.done).length;
+    sectionStats[currentPage] = { done, total: data.length };
+    updateBadge(currentPage, done, data.length);
+    renderContent(data);
+  } catch(e) {
+    c.innerHTML = `<div class="error-box">
+      <strong>Could not load sheet data</strong>
+      ${e.message}<br>
+      <b>You need to open this file via a local server, not directly from your file system.</b><br><br>Run the included <code>launch_dashboard.command</code> (Mac) or <code>launch_dashboard.bat</code> (Windows) file — it opens a local server automatically.
+    </div>`;
+  }
+}
+
+function renderContent(data) {
+  const filtered = currentFilter === 'all' ? data
+    : currentFilter === 'done' ? data.filter(t => t.done)
+    : data.filter(t => !t.done);
+  currentView === 'board' ? renderBoard(filtered) : renderList(filtered, data);
+}
+
+function renderList(tasks, allTasks) {
+  const c = document.getElementById('content');
+  const all = allTasks || tasks;
+  const done = all.filter(t => t.done).length;
+  const pct = all.length ? Math.round(done / all.length * 100) : 0;
+
+  let html = `
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-label">Total</div><div class="stat-val">${all.length}</div></div>
+      <div class="stat-card"><div class="stat-label">Completed</div><div class="stat-val green">${done}</div></div>
+      <div class="stat-card"><div class="stat-label">Remaining</div><div class="stat-val">${all.length - done}</div></div>
+      <div class="stat-card"><div class="stat-label">Progress</div><div class="stat-val">${pct}%</div>
+        <div style="margin-top:8px;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden">
+          <div style="width:${pct}%;height:100%;background:var(--green);border-radius:2px;transition:width .5s"></div>
+        </div>
+      </div>
+    </div>
+    <div class="filter-bar">
+      <span class="filter-label">Filter:</span>
+      <div class="fbtn ${currentFilter==='all'?'active':''}" onclick="setFilter('all')">All (${all.length})</div>
+      <div class="fbtn ${currentFilter==='todo'?'active':''}" onclick="setFilter('todo')">To do (${all.filter(t=>!t.done).length})</div>
+      <div class="fbtn ${currentFilter==='done'?'active':''}" onclick="setFilter('done')">Done (${done})</div>
+    </div>`;
+
+  if (!tasks.length) { html += '<div class="empty">No tasks match this filter.</div>'; c.innerHTML = html; return; }
+
+  const groups = {};
+  tasks.forEach(t => { const g = t.group || 'Tasks'; if (!groups[g]) groups[g] = []; groups[g].push(t); });
+  const multiGroup = Object.keys(groups).length > 1;
+
+  html += `<div style="border:1px solid var(--border);border-radius:8px;overflow:hidden">
+    <table class="task-table"><thead><tr>
+      <th style="width:28px"></th><th>Task</th>
+      <th style="width:120px">Deadline</th>
+      <th style="width:130px">Responsible</th>
+      <th>Notes</th>
+    </tr></thead><tbody>`;
+
+  Object.entries(groups).forEach(([g, items]) => {
+    if (multiGroup) html += `<tr class="group-row"><td colspan="5">${g} <span style="font-weight:400;opacity:.4">· ${items.length}</span></td></tr>`;
+    items.forEach(t => {
+      html += `<tr>
+        <td><div class="checkbox ${t.done?'done':''}">${t.done?'✓':''}</div></td>
+        <td><span class="task-text ${t.done?'done':''}">${t.item}</span></td>
+        <td><span class="date-tag">${t.deadline||'—'}</span></td>
+        <td>${t.responsible?`<span class="person-tag">${t.responsible}</span>`:'<span style="color:var(--text3)">—</span>'}</td>
+        <td><span class="notes-text">${t.notes||''}</span></td>
+      </tr>`;
+    });
+  });
+  html += '</tbody></table></div>';
+  c.innerHTML = html;
+}
+
+function renderBoard(tasks) {
+  const c = document.getElementById('content');
+  const todo = tasks.filter(t => !t.done);
+  const done = tasks.filter(t => t.done);
+  function col(title, items) {
+    let h = `<div class="board-col">
+      <div class="board-col-header">
+        <span class="board-col-title">${title}</span>
+        <span class="board-count">${items.length}</span>
+      </div><div class="board-cards">`;
+    if (!items.length) h += `<div style="padding:20px;text-align:center;color:var(--text3);font-size:12px;border:1px dashed var(--border);border-radius:8px">No items</div>`;
+    items.forEach(t => {
+      h += `<div class="task-card">
+        <div class="card-title ${t.done?'done':''}">${t.item}</div>
+        <div class="card-meta">
+          ${t.deadline?`<span class="date-tag">${t.deadline}</span>`:''}
+          ${t.responsible?`<span class="person-tag">${t.responsible}</span>`:''}
+        </div>
+        ${t.notes?`<div class="card-notes">${t.notes}</div>`:''}
+      </div>`;
+    });
+    return h + '</div></div>';
+  }
+  c.innerHTML = `<div class="board">${col('To do', todo)}${col('Completed', done)}</div>`;
+}
+
+async function renderDashboard() {
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <div class="page-hero">
+      <h1>API-209 Course Management</h1>
+      <p>Teaching Team Dashboard · Fall 2026 · Live progress tracker</p>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-label">Sections</div><div class="stat-val">${SECTIONS.length}</div></div>
+      <div class="stat-card"><div class="stat-label">Status</div><div class="stat-val" id="dash-status" style="font-size:15px;margin-top:3px">Loading…</div></div>
+      <div class="stat-card"><div class="stat-label">Completed</div><div class="stat-val green" id="dash-done">—</div></div>
+      <div class="stat-card"><div class="stat-label">Overall</div><div class="stat-val" id="dash-pct">—</div>
+        <div style="margin-top:8px;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden">
+          <div id="dash-bar" style="width:0%;height:100%;background:var(--green);border-radius:2px;transition:width .5s"></div>
+        </div>
+      </div>
+    </div>
+    <div class="prog-section">
+      <div class="prog-section-title">Checklist progress by section</div>
+      ${SECTIONS.map(s => `
+        <div class="prog-row" onclick="navigate('${s.key}')">
+          <div class="prog-name">${s.label}</div>
+          <div class="prog-track"><div class="prog-fill" id="pf-${s.key}" style="width:0%"></div></div>
+          <div class="prog-pct" id="pp-${s.key}">—</div>
+          <div class="prog-count" id="pc-${s.key}">loading…</div>
+        </div>`).join('')}
+    </div>
+    <div class="section-cards">
+      ${SECTIONS.map(s => `
+        <div class="sec-card" onclick="navigate('${s.key}')">
+          <div class="sec-card-name">${s.label}</div>
+          <div class="sec-card-pct" id="scp-${s.key}" style="color:var(--text3);font-size:16px">—</div>
+          <div class="sec-card-track"><div class="sec-card-fill" id="scf-${s.key}" style="width:0%"></div></div>
+          <span class="pill pill-ns" id="scs-${s.key}">Loading…</span>
+        </div>`).join('')}
+    </div>`;
+
+  let totalDone = 0, totalAll = 0;
+
+  await Promise.all(SECTIONS.map(async (s) => {
+    try {
+      const data = await getData(s.key);
+      const done = data.filter(t => t.done).length;
+      const total = data.length;
+      const pct = total ? Math.round(done / total * 100) : 0;
+      totalDone += done; totalAll += total;
+      sectionStats[s.key] = { done, total };
+      updateBadge(s.key, done, total);
+
+      const pf = document.getElementById('pf-' + s.key);
+      const pp = document.getElementById('pp-' + s.key);
+      const pc = document.getElementById('pc-' + s.key);
+      if (pf) pf.style.width = pct + '%';
+      if (pp) pp.textContent = pct + '%';
+      if (pc) pc.textContent = done + ' / ' + total;
+
+      const scp = document.getElementById('scp-' + s.key);
+      const scf = document.getElementById('scf-' + s.key);
+      const scs = document.getElementById('scs-' + s.key);
+      if (scp) { scp.textContent = pct + '%'; scp.style.color = pct===100?'var(--green)':pct>0?'#2f6df0':'var(--text3)'; scp.style.fontSize='22px'; }
+      if (scf) scf.style.width = pct + '%';
+      if (scs) { scs.textContent = pct===0?'Not started':pct===100?'Complete':'In progress'; scs.className='pill '+(pct===0?'pill-ns':pct===100?'pill-done':'pill-ip'); }
+
+      const overallPct = totalAll ? Math.round(totalDone / totalAll * 100) : 0;
+      const dd = document.getElementById('dash-done');
+      const dp = document.getElementById('dash-pct');
+      const db = document.getElementById('dash-bar');
+      const ds = document.getElementById('dash-status');
+      if (dd) dd.textContent = totalDone;
+      if (dp) dp.textContent = overallPct + '%';
+      if (db) db.style.width = overallPct + '%';
+      if (ds) ds.textContent = overallPct===0?'Not started':overallPct===100?'Complete ✓':'In progress';
+    } catch(e) {
+      const pc = document.getElementById('pc-' + s.key);
+      const scs = document.getElementById('scs-' + s.key);
+      if (pc) pc.textContent = 'error';
+      if (scs) { scs.textContent = 'Error loading'; scs.className='pill'; scs.style.cssText='background:#fff5f5;color:#991b1b'; }
+    }
+  }));
+}
+
+render();
+</script>
+</body>
+</html>
