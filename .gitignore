@@ -1,0 +1,16 @@
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+
+# macOS Finder metadata
+._*
+
+# R history files
+.Rhistory
+.RData
+
+# Temporary files
+*.tmp
+*~
