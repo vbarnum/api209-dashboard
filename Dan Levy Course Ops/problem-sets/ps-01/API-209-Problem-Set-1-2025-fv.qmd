@@ -1,0 +1,372 @@
+---
+title: "API-209 Problem Set #1"
+subtitle: " "
+date: September 1, 2025
+language: 
+  title-block-published: "Due Date"
+format: 
+  html: 
+    embed-resources: true
+---
+
+```{css, echo=FALSE}
+.answer-box {
+  background-color: LemonChiffon;
+}
+```
+
+## IDENTIFICATION
+
+1 - Your information
+
+```{text}
+Last Name:                               
+First Name:
+```
+
+2 - Group Members (please list below the classmates you worked with on this problem set):
+
+```{text}
+Group members:
+```
+
+3 - Compliance with Harvard Kennedy School Academic Code: Do you certify that my work in this problem set complies with the Harvard Kennedy School Academic Code (mark with an X below)?
+
+```{text}
+                             [   ] YES                [   ] NO
+```
+
+## INSTRUCTIONS
+
+1.  Render this file in your computer as it is right now. If it does not render correctly, address the rendering problem immediately. The teaching team will try to help you promptly. It will be much easier to identify what's causing the rendering problem(s) immediately after they occur. For this reason, render often (i.e., every time you finish a sub-question).
+
+2.  You will be asked to type your responses to this problem set in two types of boxes: text boxes (called "answer box") and code boxes (where you type and run your R code).
+
+3.  In an effort to assess the workload involved in this course, you will be asked to report on the time spent on each problem set question. Please record this time as you go along. We recommend using the timer on your smartphone (and pausing it every time you take a break).
+
+4.  If you are just learning to code and get stuck, try to figure out yourself with the techniques you learned in math camp. If you are still stuck, consult [these hints](https://docs.google.com/document/d/19SqgRxma7MErnzNkXigqrwfatrPhKPJmq_jsNvMfY4Q/edit?usp=sharing). To enable you to develop your coding skills, we strongly suggest you don't look at this document unless you are really stuck. In real life you won't have hints!
+
+5.  Before submitting, make sure you render your qmd file with your answers one last time. You will be asked to submit your qmd file and your html rendered file.
+
+\newpage
+
+## QUESTION 1 - Venezuelan Elections (2024) [^1]
+
+[^1]: This problem set question was developed jointly with José Ramón Morales, HKS MPA/ID and PhD graduate (and former API-209 TF!). He now is a faculty member at Tec Monterrey in Mexico. I am grateful to Alexa Gonzalez, Skye Yoden and Rony Rodriguez for their help in producing it.
+
+On July 28, 2024, Venezuela held a pivotal presidential election. This election was seen as a potential turning point for a country that has endured severe economic and political crises for many years. Venezuela’s GDP plummeted by 83% during the first seven years of Maduro’s administration. [^2] The Venezuelan economic decline from 2013 to 2019 was the world’s largest non-war-related collapse in at least 45 years. Additionally, nearly a quarter of the population emigrated in less than a decade.
+
+[^2]: Sources: https://www.imf.org/en/Publications/WEO/weo-database/2023/October/weo-report from https://en.wikipedia.org/wiki/Economy_of_Venezuela#cite_note-:14-21
+
+The main candidates in this election were Nicolás Maduro, the incumbent president, and Edmundo Gonzalez, who became the opposition candidate after María Corina Machado was banned from running by the Maduro administration, despite winning the opposition primaries by a landslide. Gonzalez and Machado campaigned closely together.
+
+On election night, the Consejo Nacional Electoral (CNE), Venezuela’s electoral authority, declared Maduro the winner with 51.2% of the vote. The opposition immediately declared fraud, citing copies of the “actas” (certificates printed by each voting machine at the end of the day) that they had collected through their extensive network of electoral witnesses.
+
+We will explore the fraud hypothesis later (in Part B), but for now, let’s focus on analyzing the data presented by the opposition, which contains actas that cover 83% of the votes cast that day. The dataset provides results at the level of the electoral “table” (mesa, in Spanish), which refers to a voting machine where people cast their votes. Each voting center may have more than one “table.” The key variables in the [data set](https://www.dropbox.com/scl/fi/6k0rgp4h504f9s06vanl3/RESULTADOS_2024_CSV_V2.csv?rlkey=tkcbyqja4bk0cka6uh7cqfgcy&dl=1) are:
+
+```         
+COD_EDO: State code
+EDO: State name
+COD_MUN: Municipality code
+MUN: Municipality name
+COD_PAR: Parish code
+PAR: Parish name
+CENTRO: Voting center code
+MESA: Voting table code
+VOTOS_VALIDOS: Valid votes
+VOTOS_NULOS: Null votes
+EG: Votes casted for Edmundo Gonzalez
+NM: Votes casted for Nicolas Maduro
+LM-BERA: Votes casted for the other candidates
+URL: Link to scanned copy of the “acta”
+```
+
+**STEP 0 - Preliminary steps for all problem sets**
+
+A - Render this file as is in your computer. If it does not render correctly, address the rendering problem immediately. \[Skip this if you already did it. Just making sure!\]
+
+B - Load libraries needed. Make sure tidyverse is loaded.
+
+C - Load data set. When loading the data, it's important to always assign it to an object for further use. You have two options. First, you can use the link provided above, which is the easiest and recommended method. Alternatively, you can download the file to your computer and import it by specifying the file's directory. For this first problem set, we have included below the code needed for the first option.
+
+D - Look at the data. Examine the first few rows. Form a mental image of how the data are organized. This might help you visualize what will happen to the data as you code.
+
+```{r}
+#| echo: false
+#| warning: false
+library(tidyverse)
+venezuela <- read_csv("https://www.dropbox.com/scl/fi/6k0rgp4h504f9s06vanl3/RESULTADOS_2024_CSV_V2.csv?rlkey=tkcbyqja4bk0cka6uh7cqfgcy&dl=1")
+
+```
+
+## Part A - The basics of what happened
+
+1.  How many people voted in the election according to the opposition? Count the number of valid votes.
+
+```{r}
+# Your code here:
+```
+
+------------------------------------------------------------------------
+
+::: answer-box
+*Your answer here:*
+:::
+
+------------------------------------------------------------------------
+
+2.  Create a variable that sums up all the votes from all the candidates other than Maduro and Gonzalez. Call this variable “Other”
+
+```{r}
+# Your code here:
+```
+
+3.  Report the percent of votes won by Maduro, Gonzalez and Other according to this data set.
+
+```{r}
+# Your code here:
+```
+
+------------------------------------------------------------------------
+
+::: answer-box
+*Your answer here:*
+:::
+
+------------------------------------------------------------------------
+
+4.  Assuming that the information in this data set is accurate and that they represent 83% of the votes cast, is it possible for Maduro to have won this election once the remaining votes are counted? Explain briefly \[2-3 sentences\]
+
+------------------------------------------------------------------------
+
+::: answer-box
+*Your answer here:*
+:::
+
+------------------------------------------------------------------------
+
+5.  Now compute the difference in votes between Gonzalez and Maduro in percentage points for each state in Venezuela. Call this indicator “gap.” For example, if in a state Gonzalez won 62% of the votes and Maduro won 32% of the votes, this gap indicator would be 30 percentage points. If, on the other hand, Gonzalez won 32% of the votes and Maduro won 62%, the gap would be -30 percentage points. Please answer the following questions:
+
+    a.  Report the gap indicator for each state in a format that’s easy for a busy reader to digest. **Choose one (or more) of the following options depending on your level of proficiency with R.**
+
+        1.  Table (easiest): sort states from largest to smallest gap.
+
+        2.  Graph (moderate): think about what graph would be best for a busy reader.
+
+        3.  Map (hardest): See for example \[[this map](https://www.dropbox.com/scl/fi/x0vsyqaoy6fcmox0fne3n/The-Economist-2024-Venezuelan-Election-map.jpg?rlkey=hh49jwg3snc6tsxcg0hk80h07&dl=0))\] from The Economist. To do this, you can get the shapefiles \[[here](https://data.humdata.org/dataset/5b141d29-534f-4f01-a0bc-41e2f375d925/resource/b6cf4bf5-418a-49ad-80ec-b84d0e0e0d41/download/ven_adm_ine_20210223_shp.zip).\].
+
+            ```{r}
+            # Your Code Here
+            ```
+
+    b.  Describe in a short paragraph your findings from the question just above.
+
+        1.  Describe it as best as you can. Type your paragraph here.
+
+            ::: answer-box
+            *Your answer here:*
+            :::
+
+        2.  Ask [PingPong](https://pingpong.hks.harvard.edu/group/462?assistant=1717) -an HKS homegrown AI tool that taps into ChatGPT- for help in improving your paragraph. Copy and paste your prompt and resulting AI advice here. If for some reason this AI tool does not work for you, use one that is available to you (ChatGPT, Claude, etc.)
+
+            ::: answer-box
+            *Paste here the initial prompt you used to ask the AI tool to help you improve your paragraph and resulting AI advice:*
+
+            *Paste here a link to the entire conversation with the AI tool. To do this with PingPong, simply go to the conversation and copy and paste link from your browser:*
+            :::
+
+        3.  Now attach to your AI tool the table/graph/map you produced above and ask it to describe it in one paragraph. Compare it with your paragraph and reflect on whether the two paragraphs are consistent with each other. Copy and paste AI’s paragraph below.
+
+            ::: answer-box
+            *Your answer here:*
+            :::
+
+        4.  Now based on everything above, write your best paragraph. Type your final revised paragraph here.Feel free to first tweak your table/figure/map if needed.
+
+            ::: answer-box
+            *Your answer here:*
+            :::
+
+    c.  Hugo Chavez, Maduro’s predecessor who presided Venezuela from 1998 until his death in 2013, was born in the state of Barinas. Many election observers commented that one of the opposition’s main indicators of success is how they were able to win in traditional Chavista’s strongholds such as Barinas. Calculate the percentage of voting centers in Barinas where Gonzalez won. Does this align with the observations made by election analysts?
+
+
+    ```{r}
+    # Your code here:
+    ```
+
+    ::: answer-box
+    *Your answer here:*
+    :::
+
+
+    d.  Given recent election history, Maduro was predicted to win in rural areas.
+
+        1.  Think about what data you would ideally like to have (in addition to the data set you already have) that would allow you to assess this prediction. How would you display the results? You don’t need to do the analysis; just explain briefly how it would look like. Feel free to sketch it by hand and upload a picture of it.
+
+            ::: answer-box
+            *Your answer here:*
+            :::
+
+        2.  We cannot always have the data we want. When this happens, we have to do our best with the data we have. Now assess this prediction using the data set you have or data that would be easily accessible to you with a simple web search. Do the statistical analysis and display the results in a way that is compelling for someone who wants to know whether Maduro won in rural areas.
+
+            ```{r}
+            # Your code here:
+            ```
+
+            ::: answer-box
+            *Your answer here:*
+            :::
+
+## Part B - Fraud
+
+The data set you used above was collected by the Venezuelan opposition in what can only be described as an extremely well organized and courageous effort led by Maria Corina Machado. Yet the Consejo Nacional Electoral (CNE, Venezuela’s electoral authority) declared that Maduro had won the election.
+
+6.  Given what you know about what was happening in Venezuela before Election Day, what would you have estimated to be the likelihood that Maduro would win the election (where “win” is defined as getting more votes than each of the other candidates)? Note that this is meant to be a subjective likelihood, not one that can be objectively calculated mathematically. Justify your estimate in 2-3 sentences.
+
+    ::: answer-box
+    *Your answer here:*
+    :::
+
+7.  Now let’s look at the numbers the CNE reported on election night (below). When you calculate the exact percentages (see last column of table below), these numbers look suspicious. But sometimes numbers that are suspicious are the result of natural statistical fluctuations. We will examine whether this is one of these cases.
+
+    | Candidate | Votes | Percentage reported by CNE | Actual Percentage (not rounded) |
+    |-----------------|:---------------:|:----------------:|:-------------------:|
+    | Nicolas Maduro | 5,150,092 | 51.2% | 51.1999971% |
+    | Edmundo Gonzalez | 4,445,978 | 44.2% | 44.1999989% |
+    | Others | 462,704 | 4.6% | 4.6000039% |
+    | **Totals** | 10,058,774 | 100% | 100.0000000% |
+
+    a.  Read this [blog](https://statmodeling.stat.columbia.edu/2024/07/31/suspicious-data-pattern-in-recent-venezuelan-election/) entry by Andrew Gelman, a leading and influential scholar with a knack for using statistics insightfully in a wide range of contexts.
+
+    b.  After reading it and incorporating what you learned since election night, what do you now think is the probability that Maduro won the election? Use Bayes Rule to explain how you updated your probability. Note: You are not expected to use actual numbers (although feel free to do so), but we want you to look at the formula, adapt it to this context, and explain qualitatively what factors led you to update your probability from the earlier question above.
+
+        ::: answer-box
+        *Your answer here:*
+
+        *1. Bayes Rule formula adapted to this context (i.e., write Bayes Rule formula but instead of having events A and B, use the relevant events for this context):*
+
+        *2. Your revised probability:*
+
+        *3. Explain your revised probability using adapted Bayes Rule formula:*
+        :::
+
+    c.  Look at the code proposed by Gelman in his blog:
+
+        1.  Explain what the code is doing in words and why it is informative to assess whether fraud was done in the manner that Zambrano and others speculated.
+
+        ::: answer-box
+        *Your answer here:*
+        :::
+
+        2.  Now modify the second line in the code from "S \<- 1e6" to "S \<- 1e8" and explain what you think the result should be given Gelman’s conclusions in the blog.
+
+        ::: answer-box
+        *Your answer here:*
+        :::
+
+        3.  Now run the code in R with the modified second line. Did you get the number you were expecting? Explain briefly \[2-3 sentences\].
+
+        ```{r}
+        # Your code here:
+        ```
+
+        ::: answer-box
+        *Your answer here:*
+        :::
+
+8.  After reading Gelman’s blog, another analyst says “This is way too complicated; I have an easier way to prove that there was fraud. How odd is it that the last digit of Maduro’s vote count ends in 2 and Gonzalez ends in 8, which happens to add up to a round number (10)? Not very likely. Prob (Maduro ends in 2)=1/10 and Prob(Gonzalez ends in 8)=1/10. Hence Prob(Maduro ends in 2 **and** Gonzalez ends in 8)=(1/10)\*(1/10)=1/100. Basically just a 1% chance that these results could have arisen by chance. Very unlikely results. Pretty clear evidence of fraud.”
+
+    a.  Compare this reasoning to Gelman’s. What similarities and differences do you observe?
+
+        ::: answer-box
+        *Your answer here:*
+        :::
+
+    b.  Do you think this reasoning is sound? If so, why. If not, why not?
+
+        ::: answer-box
+        *Your answer here:*
+        :::
+
+9.  \[Optional\] Draft an X post (formerly known as Tweet, max: 280 characters) with one of your key findings from this problem set. Make sure you include some visual aid (a table, graph, map, etc).\* If you would like to share with your classmates, please post on our Slack workspace using the #r-tips channel If you would like to share with the world, please post on X (i.e., tweet) using #API209.
+
+-   If you would like some inspiration for what a great X post might look like, see this [post](https://x.com/Econ_Vzla/status/1819490217658560797) from Omar Zambrano, an MPA/ID graduate from 2004. Need any more evidence that your coding skills could come in handy in the future? :-)
+
+::: answer-box
+*Please type "Done" if you did this part*
+:::
+
+# QUESTION 2 -- MEXICAN PENSIONS FOR THE POOR
+
+Read the case study "Providing Pensions for the Poor: Targeting Cash Transfers for the Elderly in Mexico." (linked in class #4 readings in home page of our Canvas site).
+
+(1) Calculate the leakage and undercoverage rates for each of the three options. Show your calculations and report the final results below:
+
+::: answer-box
+**Answer:**
+
+Option 1\
+Leakage =
+
+Option 2\
+Leakage =
+
+Option 3\
+Leakage =
+
+Option 1\
+Undercoverage =
+
+Option 2\
+Undercoverage =
+
+Option 3\
+Undercoverage =
+:::
+
+(2) Assess the advantages and disadvantages of each of the options. In doing so, consider the targeting effectiveness as well as other criteria (including political, logistical, and financial). Summarize your findings in the table below.
+
+::: answer-box
+**Answer:**
+
+Option 1\
+Advantages:
+
+Option 2\
+Advantages:
+
+Option 3\
+Advantages:
+
+Option 1\
+Disadvantages:
+
+Option 2\
+Disadvantages:
+
+Option 3\
+Disadvantages:
+:::
+
+(3) Write one crisp paragraph to the Secretary of Social Development (Sedesol) recommending which option should be selected to target the pension program and why. Justify your recommendation using the advantages and disadvantages you identified above. The paragraph should be written in a language that the head of Sedesol (who you can assume is intelligent and well-educated, but not well-versed in statistics) can understand. Enter your answer [**here**](https://forms.gle/ZxTRv89JKLg7Psrc8).
+
+::: answer-box
+*Enter your answers in the link above. Once completed, type "DONE" into this field.*
+:::
+
+------------------------------------------------------------------------
+
+# TIME USE
+
+Please enter in [**this form**](https://forms.gle/wid4uXevZF1LXFpE8) the time you spent on each question. This information will only be used for teaching improvements; **please be candid and accurate**.
+
+::: answer-box
+*Enter your answers in the link above. Once completed, type "DONE" into this field.*
+:::
+
+\newpage
+
+**This is a copy of your code. No need to do anything; this is just for our records**
+
+```{r ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE}
+```
